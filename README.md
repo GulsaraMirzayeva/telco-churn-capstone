@@ -1,38 +1,102 @@
-# Telco Churn Capstone Project
+# 📊 Telco Customer Churn Capstone Project
 
-## Project Overview
-[cite_start]This project aims to predict customer churn for a telecommunications company using a dataset of 7,043 customers[cite: 102]. [cite_start]The project demonstrates a full-stack data science workflow, from data engineering in SQL to model deployment via Streamlit[cite: 30, 31, 26].
 
-## Tech Stack
-- [cite_start]**Database:** PostgreSQL (Data storage and initial validation) [cite: 66, 30]
-- [cite_start]**Analysis & Modeling:** Python (Pandas, Scikit-Learn) [cite: 73, 19]
-- [cite_start]**Deployment:** Streamlit Cloud [cite: 26]
-- [cite_start]**Visualization:** Tableau (Bonus) and Seaborn/Matplotlib [cite: 62, 19]
 
-## Project Progress & Key Discoveries
+## 🎯 Project Overview
 
-### Stage 1: Data Engineering & SQL Validation
-[cite_start]The raw dataset was first pushed to a PostgreSQL database to ensure data integrity and demonstrate database management skills[cite: 30, 66].
+This project is an end-to-end data science initiative aimed at predicting customer churn for a telecommunications company. By analyzing a dataset of **7,043 customers**, this project demonstrates a full-stack workflow—ranging from initial data auditing and SQL-based validation to exploratory data analysis (EDA) and predictive modeling.
 
-**Key Validation Findings:**
-- [cite_start]**Row Count:** Verified that all 7,043 rows were successfully imported, matching the initial pandas audit[cite: 102].
-- [cite_start]**Missing Value Inconsistency:** A critical discovery was made regarding how missing values are represented[cite: 324]:
-    - [cite_start]`offer` and `internet_type` columns contain literal **"None"** text strings[cite: 326].
-    - [cite_start]`churn_category` and `churn_reason` columns use standard **SQL NULL** values[cite: 326].
-- [cite_start]**Target Variable:** The `churn_label` was validated as the primary target for modeling, with a distribution of 5,174 "No" and 1,869 "Yes" cases[cite: 321, 319, 320].
 
-### Stage 2: Preprocessing Strategy (Planned)
-[cite_start]Based on the SQL audit, the preprocessing pipeline will implement column-specific handling[cite: 327]:
-- [cite_start]Convert "None" strings to actual null values[cite: 298].
-- [cite_start]Implement a `ColumnTransformer` to handle different imputation needs for categorical features[cite: 19].
-- [cite_start]Remove potential data leakage variables (e.g., specific IDs or redundant churn indicators)[cite: 19].
 
-## Current Status
-- [x] [cite_start]Dataset Selection & SQL Integration [cite: 30]
-- [x] [cite_start]SQL Data Audit & Validation [cite: 323]
-- [ ] Exploratory Data Analysis (EDA)
-- [ ] Machine Learning Pipeline Development
-- [ ] Model Evaluation & Hyperparameter Tuning
-- [ ] Streamlit App Deployment
+## 🛠 Tech Stack
+
+* **Data Engineering:** SQL (PostgreSQL), Python (Pandas), SQLAlchemy
+
+* **Analysis & Stats:** SciPy (Chi-Square Testing), Seaborn, Matplotlib
+
+* **Pipeline:** Jupyter Notebooks
+
+* **Deployment (Upcoming):** Streamlit Cloud
+
+
+
+## 📂 Project Workflow & Key Discoveries
+
+
+
+### 1. Data Audit (`01_data_audit.ipynb`)
+
+Initial inspection of the dataset structure.
+
+* **Key Action:** Verified dataset dimensions (7,043 rows) and identified target variables vs. potential leakage columns.
+
+* **Observation:** Noted inconsistencies in missing data representations across different categorical columns.
+
+
+
+### 2. SQL Validation (`02_sql_validation.ipynb`)
+
+Ensuring data integrity by migrating the dataset to a PostgreSQL database.
+
+* **Key Discovery (The "None" vs. NULL issue):** Identified a critical nuance:
+
+    * `offer` and `internet_type` columns contain literal **"None"** text strings.
+
+    * `churn_category` and `churn_reason` use standard **SQL NULL** values.
+
+* **Outcome:** Confirmed that Python-based audits and SQL query results match perfectly (5,174 "No" vs. 1,869 "Yes"), ensuring the pipeline is reliable.
+
+
+
+### 3. Exploratory Data Analysis (`03_eda.ipynb`)
+
+Deep-dive statistical analysis into factors influencing churn.
+
+* **Key Insight:** There is a strong correlation between **Senior Citizen status + Bank Withdrawal payment method**, with a churn risk of approximately **45%**.
+
+* **Statistical Significance:** Conducted a Chi-Square test on `Gender` vs. `Churn`. With a **p-value of 0.4866**, we statistically rejected the hypothesis that gender influences churn in this dataset.
+
+
 
 ---
+
+
+
+## 🚀 Project Status
+
+- [x] Data Audit & Initial Inspection
+
+- [x] SQL Migration & Data Validation
+
+- [x] Exploratory Data Analysis (EDA)
+
+- [ ] Preprocessing (ColumnTransformer & Imputation)
+
+- [ ] Machine Learning Pipeline (Random Forest/XGBoost)
+
+- [ ] Model Evaluation & Deployment
+
+- [ ] Streamlit App Deployment
+
+
+
+## ⏭ Next Steps
+
+1.  **Preprocessing:** Implement `ColumnTransformer` to normalize "None" strings to actual nulls and encode categorical features.
+
+2.  **Feature Engineering:** Create interaction features (e.g., `Senior_Payment_Group`) to capture the risk factors identified in the EDA phase.
+
+3.  **Modeling:** Train and evaluate classification models to optimize for recall in high-risk segments.
+
+
+
+---
+
+*Created by Gulsara*
+
+
+
+***
+
+
+
