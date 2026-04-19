@@ -1,0 +1,17 @@
+column,reason
+Customer Status,Potential post-outcome status; leakage risk
+Churn Category,Post-churn categorical information; direct leakage
+Churn Reason,Post-outcome explanatory field; direct leakage
+Churn Score,Derived churn-risk score; high leakage risk
+Customer ID,Unique identifier; not generalizable
+Count,Constant / low-information field
+Country,Likely constant / low-information field
+State,Low-priority location feature for baseline
+City,High-cardinality geographic field
+Zip Code,Highly granular geographic identifier
+Lat Long,Redundant combined geographic field
+Latitude,Detailed coordinate field; unnecessary for baseline
+Longitude,Detailed coordinate field; unnecessary for baseline
+Quarter,Unclear baseline contribution
+CLTV,Derived business metric requiring review
+Total Revenue,Derived aggregate financial feature
