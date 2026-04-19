@@ -82,19 +82,22 @@ Deep-dive statistical analysis into factors influencing churn.
 
 ## ⏭ Next Steps
 
-1.  **Preprocessing:** Implement `ColumnTransformer` to normalize "None" strings to actual nulls and encode categorical features.
+## ⏭ Next Steps
 
-2.  **Feature Engineering:** Create interaction features (e.g., `Senior_Payment_Group`) to capture the risk factors identified in the EDA phase.
-
-3.  **Modeling:** Train and evaluate classification models to optimize for recall in high-risk segments.
-
-
-
+1. **Baseline Model Comparison:** Train and compare classification models such as Logistic Regression, Decision Tree, Random Forest, and XGBoost.
+2. **Evaluation:** Assess model performance using cross-validated F1-score, recall, precision, and ROC-AUC.
+3. **Model Improvement:** Explore tuning, threshold adjustments, and feature interpretation.
+4. **Deployment:** Package the final model into a Streamlit app for single and batch churn prediction.
 ---
 
 *Created by Gulsara*
 
+---
+## About Me
 
+**Gülsarə Mirzəyeva**  
+Aspiring Data Scientist | Python | SQL | Machine Learning  
+[LinkedIn](...) | [Email](mailto:...)
 
 ***
 
