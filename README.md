@@ -1,105 +1,113 @@
 # 📊 Telco Customer Churn Capstone Project
 
-
-
 ## 🎯 Project Overview
 
-This project is an end-to-end data science initiative aimed at predicting customer churn for a telecommunications company. By analyzing a dataset of **7,043 customers**, this project demonstrates a full-stack workflow—ranging from initial data auditing and SQL-based validation to exploratory data analysis (EDA) and predictive modeling.
+This project is an end-to-end data science capstone focused on predicting customer churn for a telecommunications company. Using a dataset of **7,043 customers**, the project follows a structured workflow including data auditing, SQL-based validation, exploratory data analysis, preprocessing, model comparison, tuning, leakage-aware sensitivity analysis, and deployment preparation.
 
+The goal is not only to build a predictive model, but also to demonstrate a clear, reproducible, and business-oriented data science process.
 
+---
 
 ## 🛠 Tech Stack
 
-* **Data Engineering:** SQL (PostgreSQL), Python (Pandas), SQLAlchemy
+- **Data Storage & Validation:** PostgreSQL, SQLAlchemy
+- **Data Processing:** Python, Pandas, NumPy
+- **Visualization & Statistics:** Matplotlib, Seaborn, SciPy
+- **Modeling:** scikit-learn, XGBoost
+- **Workflow:** Jupyter Notebooks
+- **Deployment (Upcoming):** Streamlit Cloud
 
-* **Analysis & Stats:** SciPy (Chi-Square Testing), Seaborn, Matplotlib
+---
 
-* **Pipeline:** Jupyter Notebooks
-
-* **Deployment (Upcoming):** Streamlit Cloud
-
-
-
-## 📂 Project Workflow & Key Discoveries
-
-
+## 📂 Project Workflow & Key Findings
 
 ### 1. Data Audit (`01_data_audit.ipynb`)
+Initial inspection of the dataset structure and column quality.
 
-Initial inspection of the dataset structure.
-
-* **Key Action:** Verified dataset dimensions (7,043 rows) and identified target variables vs. potential leakage columns.
-
-* **Observation:** Noted inconsistencies in missing data representations across different categorical columns.
-
-
+- **Key Action:** Verified dataset dimensions (7,043 rows), reviewed data types, checked duplicates, and profiled churn-related columns.
+- **Observation:** Missing-value representations were inconsistent across some categorical variables.
 
 ### 2. SQL Validation (`02_sql_validation.ipynb`)
+Validated the raw dataset after moving it into PostgreSQL.
 
-Ensuring data integrity by migrating the dataset to a PostgreSQL database.
-
-* **Key Discovery (The "None" vs. NULL issue):** Identified a critical nuance:
-
-    * `offer` and `internet_type` columns contain literal **"None"** text strings.
-
-    * `churn_category` and `churn_reason` use standard **SQL NULL** values.
-
-* **Outcome:** Confirmed that Python-based audits and SQL query results match perfectly (5,174 "No" vs. 1,869 "Yes"), ensuring the pipeline is reliable.
-
-
+- **Key Discovery:**  
+  - `Offer` and `Internet Type` contained literal **"None"** strings  
+  - `Churn Category` and `Churn Reason` used proper **SQL NULL**
+- **Outcome:** Python and SQL validation results matched, confirming a reliable raw-data pipeline.
 
 ### 3. Exploratory Data Analysis (`03_eda.ipynb`)
+Explored the main business and behavioral patterns associated with churn.
 
-Deep-dive statistical analysis into factors influencing churn.
+- **Key Insight:** Higher-risk churn segments included **Fiber Optic + Month-to-Month** and **Senior Citizen + Bank Withdrawal**.
+- **Statistical Check:** A Chi-Square test was conducted for `Gender` vs `Churn`. With a **p-value of 0.4866**, no statistically significant association was found, suggesting that gender is not a strong churn signal in this dataset.
 
-* **Key Insight:** There is a strong correlation between **Senior Citizen status + Bank Withdrawal payment method**, with a churn risk of approximately **45%**.
+### 4. Preprocessing & Feature Decisions (`04_preprocessing_and_feature_decisions.ipynb`)
+Prepared the baseline modeling dataset and documented preprocessing choices.
 
-* **Statistical Significance:** Conducted a Chi-Square test on `Gender` vs. `Churn`. With a **p-value of 0.4866**, we statistically rejected the hypothesis that gender influences churn in this dataset.
+- **Key Action:** Defined the target variable, normalized missing-like values, and separated feature groups for preprocessing.
+- **Leakage Review:** High-risk leakage-sensitive columns such as `Customer Status`, `Churn Category`, `Churn Reason`, and `Churn Score` were excluded from the modeling dataset.
 
+### 5. Modeling & Evaluation (`05_modeling_and_evaluation.ipynb`)
+Built the first reproducible modeling pipeline and compared multiple classification models.
 
+- **Models Compared:** Logistic Regression, Decision Tree, Random Forest, XGBoost
+- **Result:** Strong baseline performance was observed, with Random Forest leading in cross-validation and Logistic Regression showing strong balance on the test set.
+
+### 6. Model Tuning & Final Comparison (`06_model_tuning_and_final_selection.ipynb`)
+Tuned the strongest candidate models and performed an additional sensitivity review.
+
+- **Models Tuned:** Logistic Regression, Random Forest, XGBoost
+- **Key Finding:** `Satisfaction Score` had a dominant effect on model performance.
+- **Sensitivity Result:**  
+  - With `Satisfaction Score`, tuned XGBoost delivered the strongest predictive performance  
+  - Without `Satisfaction Score`, tuned Logistic Regression became the strongest conservative model
+- **Project Interpretation:** The project reports both:
+  - an **expanded high-performance view**
+  - a **conservative leakage-aware view**
 
 ---
 
-
-
-## 🚀 Project Status
+## 🚀 Current Project Status
 
 - [x] Data Audit & Initial Inspection
-
-- [x] SQL Migration & Data Validation
-
+- [x] SQL Migration & Validation
 - [x] Exploratory Data Analysis (EDA)
-
-- [ ] Preprocessing (ColumnTransformer & Imputation)
-
-- [ ] Machine Learning Pipeline (Random Forest/XGBoost)
-
-- [ ] Model Evaluation & Deployment
-
+- [x] Preprocessing & Feature Decisions
+- [x] Baseline Model Comparison
+- [x] Model Tuning
+- [x] Leakage Sensitivity Analysis
+- [ ] Model Packaging & Saving
 - [ ] Streamlit App Deployment
+- [ ] README Final Polish
 
-
+---
 
 ## ⏭ Next Steps
 
-## ⏭ Next Steps
-
-1. **Baseline Model Comparison:** Train and compare classification models such as Logistic Regression, Decision Tree, Random Forest, and XGBoost.
-2. **Evaluation:** Assess model performance using cross-validated F1-score, recall, precision, and ROC-AUC.
-3. **Model Improvement:** Explore tuning, threshold adjustments, and feature interpretation.
-4. **Deployment:** Package the final model into a Streamlit app for single and batch churn prediction.
----
-
-*Created by Gulsara*
+1. **Model Packaging:** Save the expanded and conservative final pipelines for reuse.
+2. **Streamlit App:** Build a public app that supports both single prediction and bulk CSV prediction.
+3. **Model Interpretation in App:** Display probability, key metrics, and selected visual outputs.
+4. **README & Portfolio Polish:** Finalize documentation, screenshots, and project presentation materials.
 
 ---
+
+## Final Modeling View
+
+This project does not reduce the outcome to a single oversimplified final claim.
+
+Instead, it presents two final model views:
+
+- **Expanded Model:** tuned XGBoost with `Satisfaction Score`, offering stronger predictive performance
+- **Conservative Model:** tuned Logistic Regression without `Satisfaction Score`, offering a more defensible leakage-aware result
+
+For real deployment and business-facing reporting, the **conservative model** is treated as the primary recommendation until the timing and deployability of `Satisfaction Score` can be fully verified.
+
+---
+
 ## About Me
 
-**Gülsarə Mirzəyeva**  
+**Gulsare Mirzayeva**  
 Aspiring Data Scientist | Python | SQL | Machine Learning  
 [LinkedIn](...) | [Email](mailto:...)
 
-***
-
-
-
+---
