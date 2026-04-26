@@ -15,6 +15,10 @@
         "Quarter",
         "CLTV",
         "Total Revenue",
+        "Under 30",
+        "Senior Citizen",
+        "Dependents",
+        "Referred a Friend",
         "Churn Label"
     ],
     "numeric_features": [
@@ -34,11 +38,7 @@
     ],
     "categorical_features": [
         "Gender",
-        "Under 30",
-        "Senior Citizen",
         "Married",
-        "Dependents",
-        "Referred a Friend",
         "Offer",
         "Phone Service",
         "Multiple Lines",
