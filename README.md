@@ -67,6 +67,15 @@ Tuned the strongest candidate models and performed an additional sensitivity rev
 
 ---
 
+## 🚀 How to Run the Streamlit App Locally
+
+After cloning the repository and installing the required packages, run the Streamlit app from the project root:
+
+```bash
+pip install -r requirements.txt
+streamlit run app/streamlit_app.py
+
+
 ## 🚀 Current Project Status
 
 - [x] Data Audit & Initial Inspection
@@ -105,16 +114,6 @@ Instead, it presents two final model views:
 For real deployment and business-facing reporting, the **conservative model** is treated as the primary recommendation until the timing and deployability of `Satisfaction Score` can be fully verified.
 
 ---
-
-
-## How to Run This Project
-
-1. Clone the repository
-2. Create a virtual environment
-3. Install requirements
-4. Run notebooks
-5. Run Streamlit app
-
 
 ## About Me
 
