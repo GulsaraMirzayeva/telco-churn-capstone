@@ -8,6 +8,19 @@ The goal is not only to build a predictive model, but also to demonstrate a clea
 
 ---
 
+## 🔗 Live Demo
+
+Streamlit App: [Open App](https://telco-churn-capstone-dd4vehvfvqbd5uy5vfch5p.streamlit.app/)
+
+The deployed app supports:
+
+- single customer churn prediction
+- bulk CSV churn prediction
+- churn probability output
+- risk-level classification
+
+---
+
 ## 🛠 Tech Stack
 
 - **Data Storage & Validation:** PostgreSQL, SQLAlchemy
@@ -15,7 +28,7 @@ The goal is not only to build a predictive model, but also to demonstrate a clea
 - **Visualization & Statistics:** Matplotlib, Seaborn, SciPy
 - **Modeling:** scikit-learn, XGBoost
 - **Workflow:** Jupyter Notebooks
-- **Deployment (Upcoming):** Streamlit Cloud
+- **Deployment:** Streamlit Cloud
 
 ---
 
@@ -85,8 +98,8 @@ streamlit run app/streamlit_app.py
 - [x] Baseline Model Comparison
 - [x] Model Tuning
 - [x] Leakage Sensitivity Analysis
-- [ ] Model Packaging & Saving
-- [ ] Streamlit App Deployment
+- [x] Model Packaging & Saving
+- [x] Streamlit App Deployment
 - [ ] README Final Polish
 - [ ] Tableau Dashboard
 - [ ] Final Presentation
@@ -95,10 +108,10 @@ streamlit run app/streamlit_app.py
 
 ## ⏭ Next Steps
 
-1. **Model Packaging:** Save the expanded and conservative final pipelines for reuse.
-2. **Streamlit App:** Build a public app that supports both single prediction and bulk CSV prediction.
-3. **Model Interpretation in App:** Display probability, key metrics, and selected visual outputs.
-4. **README & Portfolio Polish:** Finalize documentation, screenshots, and project presentation materials.
+1. **Tableau Dashboard:** Build a dashboard to summarize churn patterns and key business insights.
+2. **Model Interpretation in App:** Add selected model metrics or visual outputs to the Streamlit app.
+3. **README & Portfolio Polish:** Finalize documentation, screenshots, and project presentation materials.
+4. **Final Presentation:** Prepare a concise project story from business problem to deployed solution.
 
 ---
 
