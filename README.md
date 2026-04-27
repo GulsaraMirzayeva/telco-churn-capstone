@@ -60,7 +60,7 @@ Tuned the strongest candidate models and performed an additional sensitivity rev
 - **Key Finding:** `Satisfaction Score` had a dominant effect on model performance.
 - **Sensitivity Result:**  
   - With `Satisfaction Score`, tuned XGBoost delivered the strongest predictive performance  
-  - Without `Satisfaction Score`, tuned Logistic Regression became the strongest conservative model
+  - Without `Satisfaction Score`, tuned Logistic Regression was selected as the recommended conservative model because it offers a better balance between performance, interpretability, and defensibility.
 - **Project Interpretation:** The project reports both:
   - an **expanded high-performance view**
   - a **conservative leakage-aware view**
@@ -79,6 +79,8 @@ Tuned the strongest candidate models and performed an additional sensitivity rev
 - [ ] Model Packaging & Saving
 - [ ] Streamlit App Deployment
 - [ ] README Final Polish
+- [ ] Tableau Dashboard
+- [ ] Final Presentation
 
 ---
 
