@@ -106,6 +106,16 @@ For real deployment and business-facing reporting, the **conservative model** is
 
 ---
 
+
+## How to Run This Project
+
+1. Clone the repository
+2. Create a virtual environment
+3. Install requirements
+4. Run notebooks
+5. Run Streamlit app
+
+
 ## About Me
 
 **Gulsare Mirzayeva**  
