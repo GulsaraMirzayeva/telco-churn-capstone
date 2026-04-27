@@ -74,7 +74,7 @@ After cloning the repository and installing the required packages, run the Strea
 ```bash
 pip install -r requirements.txt
 streamlit run app/streamlit_app.py
-
+```
 
 ## 🚀 Current Project Status
 
