@@ -9,3 +9,4 @@ seaborn
 scipy
 sqlalchemy
 psycopg2-binary
+plotly
