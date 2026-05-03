@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import plotly.express as px
 from pathlib import Path
+from sqlalchemy import create_engine, text
 
 
 # -----------------------------
@@ -24,7 +25,7 @@ MODEL_PATH = PROJECT_ROOT / "models" / "conservative_logistic_regression_v2_pipe
 
 FINAL_THRESHOLD = 0.30
 LINKEDIN_URL = "https://www.linkedin.com/in/gulsara-mirzayeva/"
-
+DB_TABLE_NAME = "telco_customer_lookup"
 
 # -----------------------------
 # Expected model features
@@ -194,6 +195,106 @@ def prepare_features(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError(f"Missing required columns: {missing_columns}")
 
     return df[EXPECTED_FEATURES].copy()
+
+DB_TO_MODEL_COLUMN_MAP = {
+    "age": "Age",
+    "number_of_dependents": "Number of Dependents",
+    "population": "Population",
+    "number_of_referrals": "Number of Referrals",
+    "tenure_in_months": "Tenure in Months",
+    "avg_monthly_long_distance_charges": "Avg Monthly Long Distance Charges",
+    "avg_monthly_gb_download": "Avg Monthly GB Download",
+    "monthly_charge": "Monthly Charge",
+    "total_refunds": "Total Refunds",
+    "total_extra_data_charges": "Total Extra Data Charges",
+    "total_long_distance_charges": "Total Long Distance Charges",
+    "gender": "Gender",
+    "married": "Married",
+    "offer": "Offer",
+    "phone_service": "Phone Service",
+    "multiple_lines": "Multiple Lines",
+    "internet_service": "Internet Service",
+    "internet_type": "Internet Type",
+    "online_security": "Online Security",
+    "online_backup": "Online Backup",
+    "device_protection_plan": "Device Protection Plan",
+    "premium_tech_support": "Premium Tech Support",
+    "streaming_tv": "Streaming TV",
+    "streaming_movies": "Streaming Movies",
+    "streaming_music": "Streaming Music",
+    "unlimited_data": "Unlimited Data",
+    "contract": "Contract",
+    "paperless_billing": "Paperless Billing",
+    "payment_method": "Payment Method",
+}
+
+
+@st.cache_resource
+def get_db_engine():
+    try:
+        return create_engine(st.secrets["DATABASE_URL"], pool_pre_ping=True)
+    except KeyError:
+        st.error("DATABASE_URL is missing from Streamlit secrets.")
+        st.stop()
+    except Exception as error:
+        st.error("Database connection could not be created.")
+        st.write(error)
+        st.stop()
+
+
+@st.cache_data(ttl=600)
+def load_customer_options() -> pd.DataFrame:
+    engine = get_db_engine()
+
+    query = text(
+        f"""
+        SELECT customer_id, contract, internet_type, monthly_charge, churn_label
+        FROM "{DB_TABLE_NAME}"
+        ORDER BY customer_id
+        """
+    )
+
+    customers = pd.read_sql_query(query, engine)
+
+    customers["customer_label"] = customers.apply(
+        lambda row: (
+            f"{row['customer_id']} | "
+            f"{row['contract']} | "
+            f"{row['internet_type']} | "
+            f"{row['monthly_charge']} | "
+            f"Actual Churn: {row['churn_label']}"
+        ),
+        axis=1
+    )
+
+    return customers
+
+
+def get_customer_by_id(customer_id: str) -> pd.DataFrame:
+    engine = get_db_engine()
+
+    query = text(
+        f"""
+        SELECT *
+        FROM "{DB_TABLE_NAME}"
+        WHERE customer_id = :customer_id
+        LIMIT 1
+        """
+    )
+
+    return pd.read_sql_query(
+        query,
+        engine,
+        params={"customer_id": customer_id}
+    )
+
+
+def convert_db_customer_to_model_features(customer_df: pd.DataFrame) -> pd.DataFrame:
+    renamed_df = customer_df.rename(columns=DB_TO_MODEL_COLUMN_MAP)
+    cleaned_df = normalize_missing_values(renamed_df)
+    feature_df = prepare_features(cleaned_df)
+
+    return feature_df
 
 
 def classify_risk(probability: float) -> str:
@@ -471,7 +572,13 @@ model = load_model()
 st.sidebar.title("📊 Telco Churn")
 page = st.sidebar.radio(
     "Navigation",
-    ["Single Prediction", "Bulk Prediction", "Model Explainability", "About Project"],
+    [
+        "Single Prediction",
+        "Existing Customer Lookup",
+        "Bulk Prediction",
+        "Model Explainability",
+        "About Project",
+    ]
 )
 
 st.sidebar.divider()
@@ -705,7 +812,134 @@ if page == "Single Prediction":
             st.session_state.single_prediction_result = None
             st.rerun()
 
+# -----------------------------
+# Existing Customer Lookup Page
+# -----------------------------
+elif page == "Existing Customer Lookup":
+    st.subheader("Existing Customer Lookup")
+    st.write(
+        "Select an existing customer from the cloud PostgreSQL database and generate a churn prediction."
+    )
 
+    st.caption(
+        "In a real business setting, this Customer ID would usually come from a CRM or customer support screen. "
+        "In this capstone demo, the customer profile is retrieved from Neon PostgreSQL."
+    )
+
+    try:
+        customer_options = load_customer_options()
+
+        selected_label = st.selectbox(
+            "Select customer",
+            customer_options["customer_label"].tolist()
+        )
+
+        selected_customer_id = customer_options.loc[
+            customer_options["customer_label"] == selected_label,
+            "customer_id"
+        ].iloc[0]
+
+        if st.button("Load Customer and Predict"):
+            customer_db_df = get_customer_by_id(selected_customer_id)
+
+            if customer_db_df.empty:
+                st.error("No customer found with this Customer ID.")
+            else:
+                st.success(f"Customer found: {selected_customer_id}")
+
+                preview_columns = [
+                    "customer_id",
+                    "contract",
+                    "internet_type",
+                    "payment_method",
+                    "tenure_in_months",
+                    "monthly_charge",
+                    "churn_label",
+                ]
+
+                available_preview_columns = [
+                    col for col in preview_columns if col in customer_db_df.columns
+                ]
+
+                st.markdown("#### Customer profile from PostgreSQL")
+                st.dataframe(customer_db_df[available_preview_columns])
+
+                feature_df = convert_db_customer_to_model_features(customer_db_df)
+
+                prediction_probability = model.predict_proba(feature_df)[0][1]
+                prediction_class = int(prediction_probability >= FINAL_THRESHOLD)
+                risk_label = classify_risk(prediction_probability)
+                explanation_df = build_local_explanation(model, feature_df, top_n=10)
+
+                st.divider()
+                st.subheader("Prediction Result")
+
+                result_col1, result_col2, result_col3 = st.columns(3)
+
+                result_col1.metric("Churn Probability", f"{prediction_probability:.1%}")
+                result_col2.metric("Predicted Churn", "Yes" if prediction_class == 1 else "No")
+                result_col3.metric("Risk Level", risk_label)
+
+                st.progress(int(prediction_probability * 100))
+                show_risk_message(risk_label)
+
+                actual_churn = customer_db_df["churn_label"].iloc[0]
+
+                st.caption(
+                    f"Actual churn label in the dataset: **{actual_churn}**. "
+                    "This is shown for evaluation context and is not used as a model input."
+                )
+
+                with st.expander("Why this prediction?", expanded=True):
+                    show_explanation_summary(explanation_df)
+
+                    st.divider()
+
+                    show_explanation_chart(explanation_df)
+
+                    if not explanation_df.empty:
+                        top_increasing = (
+                            explanation_df[explanation_df["contribution"] > 0]
+                            .sort_values("contribution", ascending=False)
+                            .head(1)
+                        )
+
+                        top_reducing = (
+                            explanation_df[explanation_df["contribution"] < 0]
+                            .sort_values("contribution", ascending=True)
+                            .head(1)
+                        )
+
+                        st.markdown("#### Plain-language interpretation")
+
+                        if not top_increasing.empty:
+                            st.write(
+                                f"The largest risk-increasing model contribution for this specific customer is "
+                                f"**{top_increasing.iloc[0]['feature']}**."
+                            )
+
+                        if not top_reducing.empty:
+                            st.write(
+                                f"The largest risk-reducing model contribution for this specific customer is "
+                                f"**{top_reducing.iloc[0]['feature']}**."
+                            )
+
+                        st.caption(
+                            "This explanation is local to the selected customer. "
+                            "It does not mean that one feature always has the same effect for every customer."
+                        )
+
+                st.divider()
+                show_retention_suggestions(
+                    feature_df.iloc[0].to_dict(),
+                    prediction_probability
+                )
+
+    except Exception as error:
+        st.error("Customer lookup failed.")
+        st.write(error)
+
+        
 
 # -----------------------------
 # Bulk Prediction Page
