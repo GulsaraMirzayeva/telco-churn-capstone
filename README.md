@@ -2,9 +2,23 @@
 
 ## 🎯 Project Overview
 
-This project is an end-to-end data science capstone focused on predicting customer churn for a telecommunications company. Using a dataset of **7,043 customers**, the project follows a structured workflow including data auditing, SQL-based validation, exploratory data analysis, preprocessing, model comparison, tuning, leakage-aware sensitivity analysis, and deployment preparation.
+This is my end-to-end Data Science capstone project on Telco Customer Churn prediction.
 
-The goal is not only to build a predictive model, but also to demonstrate a clear, reproducible, and business-oriented data science process.
+The goal of the project is not only to build a model that predicts churn, but also to understand the business problem behind churn and turn the model into something usable.
+
+I worked with a dataset of **7,043 customers** and followed a full data science workflow:
+
+- data audit
+- SQL validation
+- exploratory data analysis
+- preprocessing and feature decisions
+- model comparison and tuning
+- leakage-aware final model selection
+- threshold tuning
+- Streamlit deployment
+- cloud PostgreSQL customer lookup
+
+One of the main lessons of this project was that the model with the highest score is not always the best final answer. For the final recommendation, I focused on a model that is easier to explain, safer to defend, and more realistic for business use.
 
 ---
 
@@ -15,123 +29,390 @@ Streamlit App: [Open App](https://telco-churn-capstone-dd4vehvfvqbd5uy5vfch5p.st
 The deployed app supports:
 
 - single customer churn prediction
+- existing customer lookup from Neon PostgreSQL
 - bulk CSV churn prediction
 - churn probability output
+- predicted churn label
 - risk-level classification
+- local model explanation
+- recommended retention actions
+
+The app is designed as a simple business-facing tool. A user can manually enter customer information, select an existing customer from the database, or upload a CSV file for bulk predictions.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Data Storage & Validation:** PostgreSQL, SQLAlchemy
+- **Data Storage & Validation:** PostgreSQL, Neon PostgreSQL, SQLAlchemy
 - **Data Processing:** Python, Pandas, NumPy
 - **Visualization & Statistics:** Matplotlib, Seaborn, SciPy
 - **Modeling:** scikit-learn, XGBoost
-- **Workflow:** Jupyter Notebooks
-- **Deployment:** Streamlit Cloud
+- **App & Deployment:** Streamlit, Streamlit Cloud, Plotly
+- **Workflow:** Jupyter Notebooks, GitHub
 
 ---
 
 ## 📂 Project Workflow & Key Findings
 
 ### 1. Data Audit (`01_data_audit.ipynb`)
-Initial inspection of the dataset structure and column quality.
 
-- **Key Action:** Verified dataset dimensions (7,043 rows), reviewed data types, checked duplicates, and profiled churn-related columns.
-- **Observation:** Missing-value representations were inconsistent across some categorical variables.
+The first step was to understand the dataset structure before doing any modeling.
+
+I checked:
+
+- dataset shape
+- column names and data types
+- duplicate records
+- target column
+- churn-related columns
+- missing-value patterns
+
+The dataset contains **7,043 customer records**.
+
+One early observation was that some missing values were not represented in the same way across the dataset. This was important because inconsistent missing-value representation can later affect both SQL validation and Python preprocessing.
+
+---
 
 ### 2. SQL Validation (`02_sql_validation.ipynb`)
-Validated the raw dataset after moving it into PostgreSQL.
 
-- **Key Discovery:**  
-  - `Offer` and `Internet Type` contained literal **"None"** strings  
-  - `Churn Category` and `Churn Reason` used proper **SQL NULL**
-- **Outcome:** Python and SQL validation results matched, confirming a reliable raw-data pipeline.
+After the initial audit, I moved the raw data into PostgreSQL and used SQL for validation.
+
+The goal was not to clean the full dataset in SQL, but to check whether the imported raw data was reliable.
+
+Important checks included:
+
+- row count validation
+- previewing imported records
+- checking missing-value representation
+- comparing SQL results with Python results
+
+One important finding was:
+
+- `Offer` and `Internet Type` contained literal `"None"` strings
+- `Churn Category` and `Churn Reason` used proper SQL NULL values
+
+This helped me decide that SQL would be used as a validation layer, while modeling-related cleaning would be handled in Python.
+
+---
 
 ### 3. Exploratory Data Analysis (`03_eda.ipynb`)
-Explored the main business and behavioral patterns associated with churn.
 
-- **Key Insight:** Higher-risk churn segments included **Fiber Optic + Month-to-Month** and **Senior Citizen + Bank Withdrawal**.
-- **Statistical Check:** A Chi-Square test was conducted for `Gender` vs `Churn`. With a **p-value of 0.4866**, no statistically significant association was found, suggesting that gender is not a strong churn signal in this dataset.
+The EDA focused on understanding which customer groups are more likely to churn.
+
+I checked churn patterns by:
+
+- contract type
+- internet type
+- payment method
+- tenure
+- monthly charge
+- senior citizen status
+- combined customer segments
+
+Some important patterns were:
+
+- Month-to-month contract customers showed higher churn risk.
+- Fiber optic customers appeared as an important churn-related segment.
+- Customers with shorter tenure were more likely to churn.
+- Customers with higher monthly charges showed higher churn tendency.
+- Bank withdrawal and mailed check customers appeared riskier than credit card customers.
+- Gender did not show a meaningful churn difference.
+
+I also used a Chi-Square test for `Gender` vs `Churn Label`.
+
+The p-value was **0.4866**, so I did not treat gender as a strong churn signal in this dataset.
+
+Two important business segments were:
+
+- **Fiber Optic + Month-to-Month**
+- **Senior Citizen + Bank Withdrawal**
+
+---
 
 ### 4. Preprocessing & Feature Decisions (`04_preprocessing_and_feature_decisions.ipynb`)
-Prepared the baseline modeling dataset and documented preprocessing choices.
 
-- **Key Action:** Defined the target variable, normalized missing-like values, and separated feature groups for preprocessing.
-- **Leakage Review:** High-risk leakage-sensitive columns such as `Customer Status`, `Churn Category`, `Churn Reason`, and `Churn Score` were excluded from the modeling dataset.
+In this stage, I prepared the data for machine learning.
+
+The preprocessing included:
+
+- defining the target variable
+- removing leakage-sensitive columns
+- separating numerical and categorical features
+- imputing missing values
+- scaling numerical features
+- one-hot encoding categorical features
+- building a reproducible pipeline with `ColumnTransformer`
+
+Some columns were removed because they were too close to the churn outcome or directly described churn after it happened.
+
+Examples:
+
+- `Customer Status`
+- `Churn Category`
+- `Churn Reason`
+- `Churn Score`
+- `Churn Label` as target, not feature
+
+This step was important because the model should learn from customer behavior and profile data, not from columns that already explain the churn result.
+
+---
 
 ### 5. Modeling & Evaluation (`05_modeling_and_evaluation.ipynb`)
-Built the first reproducible modeling pipeline and compared multiple classification models.
 
-- **Models Compared:** Logistic Regression, Decision Tree, Random Forest, XGBoost
-- **Result:** Strong baseline performance was observed, with Random Forest leading in cross-validation and Logistic Regression showing strong balance on the test set.
+I compared several classification models:
 
-### 6. Model Tuning & Final Comparison (`06_model_tuning_and_final_selection.ipynb`)
-Tuned the strongest candidate models and performed an additional sensitivity review.
+- Logistic Regression
+- Decision Tree
+- Random Forest
+- XGBoost
 
-- **Models Tuned:** Logistic Regression, Random Forest, XGBoost
-- **Key Finding:** `Satisfaction Score` had a dominant effect on model performance.
-- **Sensitivity Result:**  
-  - With `Satisfaction Score`, tuned XGBoost delivered the strongest predictive performance  
-  - Without `Satisfaction Score`, tuned Logistic Regression was selected as the recommended conservative model because it offers a better balance between performance, interpretability, and defensibility.
-- **Project Interpretation:** The project reports both:
-  - an **expanded high-performance view**
-  - a **conservative leakage-aware view**
+At this stage, I wanted to see how different models behave on the same preprocessing pipeline.
+
+The models gave strong results, especially when high-impact features were included. However, I did not want to make the final decision only based on the highest score. I also considered interpretability and whether the model could be explained to a business user.
 
 ---
 
-## 🚀 How to Run the Streamlit App Locally
+### 6. Model Tuning & Final Selection (`06_model_tuning_and_final_selection.ipynb`)
 
-After cloning the repository and installing the required packages, run the Streamlit app from the project root:
+In the final modeling stage, I tuned the strongest candidate models and reviewed the final model decision more carefully.
 
-```bash
-pip install -r requirements.txt
-streamlit run app/streamlit_app.py
-```
+Models tuned:
 
-## 🚀 Current Project Status
+- Logistic Regression
+- Random Forest
+- XGBoost
 
-- [x] Data Audit & Initial Inspection
-- [x] SQL Migration & Validation
-- [x] Exploratory Data Analysis (EDA)
-- [x] Preprocessing & Feature Decisions
-- [x] Baseline Model Comparison
-- [x] Model Tuning
-- [x] Leakage Sensitivity Analysis
-- [x] Model Packaging & Saving
-- [x] Streamlit App Deployment
-- [ ] README Final Polish
-- [ ] Tableau Dashboard
-- [ ] Final Presentation
+One important finding was that `Satisfaction Score` had a very strong impact on model performance.
 
----
+However, I treated `Satisfaction Score` carefully because it may not be safely available before churn in a real business setting. Because of that, I removed it from the final conservative model.
 
-## ⏭ Next Steps
+I also removed `Total Charges` from the final model because it is strongly related to:
 
-1. **Tableau Dashboard:** Build a dashboard to summarize churn patterns and key business insights.
-2. **Model Interpretation in App:** Add selected model metrics or visual outputs to the Streamlit app.
-3. **README & Portfolio Polish:** Finalize documentation, screenshots, and project presentation materials.
-4. **Final Presentation:** Prepare a concise project story from business problem to deployed solution.
+- `Tenure in Months`
+- `Monthly Charge`
+
+Keeping all three features together can make Logistic Regression coefficients harder to interpret.
+
+The final selected model is:
+
+> **Logistic Regression v2 without `Satisfaction Score` and `Total Charges`**
+
+The final model was selected because it gives a better balance between performance, interpretability, and business defensibility.
 
 ---
 
 ## Final Modeling View
 
-This project does not reduce the outcome to a single oversimplified final claim.
+This project does not end with “the model with the highest score wins.”
 
-Instead, it presents two final model views:
+During the modeling stage, I saw that the expanded XGBoost model achieved the strongest raw performance when `Satisfaction Score` was included. But I did not want to make the final recommendation only based on that result.
 
-- **Expanded Model:** tuned XGBoost with `Satisfaction Score`, offering stronger predictive performance
-- **Conservative Model:** tuned Logistic Regression without `Satisfaction Score`, offering a more defensible leakage-aware result
+`Satisfaction Score` may be too close to the churn decision or may not be available early enough in a real prediction setting. Because of that, I treated it as leakage-sensitive and removed it from the final conservative model.
 
-For real deployment and business-facing reporting, the **conservative model** is treated as the primary recommendation until the timing and deployability of `Satisfaction Score` can be fully verified.
+I also removed `Total Charges` from the final model. This feature is strongly related to `Tenure in Months` and `Monthly Charge`, and keeping all three together can make Logistic Regression coefficients harder to interpret.
+
+Final selected model:
+
+> **Logistic Regression v2 without `Satisfaction Score` and `Total Charges`**
+
+Final test performance:
+
+| Metric | Value |
+|---|---:|
+| Best CV F1 | 0.6914 |
+| Test Accuracy | 0.8417 |
+| Test Precision | 0.7254 |
+| Test Recall | 0.6497 |
+| Test F1 | 0.6855 |
+| Test ROC-AUC | 0.9016 |
+
+After threshold tuning, I selected:
+
+> **Final threshold = 0.30**
+
+At this threshold:
+
+| Metric | Value |
+|---|---:|
+| Precision | 0.6019 |
+| Recall | 0.8449 |
+| F1-score | 0.7030 |
+
+I selected this threshold because churn prediction is a retention problem. Missing too many real churn customers can be costly, but campaign cost also matters.
+
+Threshold `0.30` gave the best F1-score and a better balance between catching potential churners and avoiding unnecessary retention actions.
+
+For this reason, the final model is selected not only because of performance, but because it is more interpretable, more defensible, and more realistic for business-facing use.
+
+---
+
+## 🚀 Streamlit App
+
+The Streamlit app turns the final model into a simple business-facing prediction tool.
+
+It includes three main workflows:
+
+### 1. Single Prediction
+
+The user can manually enter customer information and get:
+
+- churn probability
+- predicted churn label
+- risk level
+- model explanation
+- recommended retention actions
+
+### 2. Existing Customer Lookup
+
+The app connects to **Neon PostgreSQL** and allows the user to select an existing customer from the database.
+
+The workflow is:
+
+1. select customer from PostgreSQL database
+2. load customer profile
+3. send customer features to the model
+4. generate churn probability
+5. show explanation and recommended action
+
+In this workflow, `Customer ID` is not used as a model feature. It is only used to retrieve the customer profile from the database.
+
+This makes the app closer to a real business workflow where an operator or retention team member looks up an existing customer from a CRM or database.
+
+### 3. Bulk Prediction
+
+The user can upload a CSV file with multiple customer records.
+
+The app returns:
+
+- churn probability
+- predicted churn label
+- risk level
+
+The result can also be downloaded as a CSV file.
+
+---
+
+## 🧠 Model Explainability
+
+Since the final model is Logistic Regression, I used coefficient-based explanation.
+
+The app includes:
+
+- global coefficient explanation
+- local explanation for a selected customer
+- factors increasing churn risk
+- factors reducing churn risk
+
+The explanation is presented carefully as model contribution, not direct causality.
+
+This is important because a feature can behave differently in one specific prediction depending on the full encoded feature set. For that reason, the app explains that the contribution values are local to the selected customer.
+
+---
+
+## 📁 Project Structure
+
+```text
+telco-churn-capstone/
+├── app/
+│   └── streamlit_app.py
+├── data/
+│   └── raw/
+│       └── telco.csv
+├── models/
+│   └── conservative_logistic_regression_v2_pipeline.joblib
+├── notebooks/
+│   ├── 01_data_audit.ipynb
+│   ├── 02_sql_validation.ipynb
+│   ├── 03_eda.ipynb
+│   ├── 04_preprocessing_and_feature_decisions.ipynb
+│   ├── 05_modeling_and_evaluation.ipynb
+│   └── 06_model_tuning_and_final_selection.ipynb
+├── scripts/
+│   ├── upload_customer_lookup_to_neon.py
+│   └── check_neon_customer_table.py
+├── requirements.txt
+├── README.md
+└── model_documentation.md
+```
+
+---
+
+## 🚀 How to Run the Streamlit App Locally
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the Streamlit app:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+For the PostgreSQL customer lookup feature, a valid `DATABASE_URL` must be added to Streamlit secrets.
+
+Local secrets should be stored in:
+
+```text
+.streamlit/secrets.toml
+```
+
+Example format:
+
+```toml
+DATABASE_URL = "postgresql+psycopg2://USER:PASSWORD@HOST/DATABASE?sslmode=require"
+```
+
+This file should not be pushed to GitHub.
+
+---
+
+## 📌 Current Project Status
+
+Completed:
+
+- [x] Data Audit & Initial Inspection
+- [x] SQL Migration & Validation
+- [x] Exploratory Data Analysis
+- [x] Preprocessing & Feature Decisions
+- [x] Baseline Model Comparison
+- [x] Model Tuning
+- [x] Leakage Sensitivity Analysis
+- [x] Final Model Selection
+- [x] Threshold Tuning
+- [x] Model Packaging & Saving
+- [x] Streamlit App Deployment
+- [x] Neon PostgreSQL Customer Lookup
+- [x] Single Prediction
+- [x] Bulk CSV Prediction
+- [x] Model Explainability in App
+- [x] Model Documentation Summary
+
+Remaining:
+
+- [ ] Tableau Dashboard
+- [ ] Final Presentation
+- [ ] Final README Screenshots / Polish
+- [ ] Final Notebook Cleanup
+
+---
+
+## ⏭ Next Steps
+
+1. **Tableau Dashboard:** Build a visual dashboard for churn segment analysis and business insights.
+2. **README Screenshots:** Add final screenshots from the Streamlit app.
+3. **Notebook Cleanup:** Review notebook markdowns and make sure the explanations are clear and not repetitive.
+4. **Final Presentation:** Prepare a concise project story from business problem to deployed solution.
+5. **Future Monitoring Note:** Add a short note about possible model monitoring, such as data drift and performance tracking.
 
 ---
 
 ## About Me
 
 **Gulsare Mirzayeva**  
+Data Science Trainee at Div Academy  
 Aspiring Data Scientist | Python | SQL | Machine Learning  
-[LinkedIn](...) | [Email](mailto:...)
 
----
+[LinkedIn](https://www.linkedin.com/in/gulsara-mirzayeva/) | [Email](mailto:mirzayevagulsare@gmail.com)
