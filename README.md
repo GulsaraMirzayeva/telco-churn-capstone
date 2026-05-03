@@ -41,6 +41,45 @@ The app is designed as a simple business-facing tool. A user can manually enter 
 
 ---
 
+## 📸 App Preview
+
+The Streamlit app turns the final model into a business-facing prediction tool.  
+It supports manual prediction, PostgreSQL customer lookup, bulk CSV prediction, model explanation, and recommended retention actions.
+
+### 1. App Overview
+
+![Streamlit App Overview](reports/images/streamlit_app_overview.png)
+
+### 2. Single Prediction Result
+
+![Prediction Result](reports/images/prediction_result.png)
+
+### 3. Local Model Explanation Summary
+
+![Model Explainability Summary](reports/images/model_explainability1.png)
+
+### 4. Feature Contribution Chart
+
+![Feature Contribution Chart](reports/images/model_explainability2.png)
+
+### 5. Detailed Explainability View
+
+![Detailed Explainability View](reports/images/model_explainability3.png)
+
+### 6. Existing Customer Lookup from PostgreSQL
+
+![Customer Lookup from PostgreSQL](reports/images/customer_lookup_postgresql1.png)
+
+### 7. Customer Lookup Prediction Result
+
+![Customer Lookup Prediction Result](reports/images/customer_lookup_postgresql2.png)
+
+### 8. Recommended Retention Actions
+
+![Recommended Retention Actions](reports/images/recommended_retention_actions.png)
+
+--- 
+
 ## 🛠 Tech Stack
 
 - **Data Storage & Validation:** PostgreSQL, Neon PostgreSQL, SQLAlchemy
