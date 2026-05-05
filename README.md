@@ -526,8 +526,8 @@ Remaining:
 
 ## About Me
 
-**Gulsare Mirzayeva**  
-Data Science Trainee at Div Academy  
-Aspiring Data Scientist | Python | SQL | Machine Learning  
+**Gulsara Mirzayeva**  
+RWS Group | Div Academy  
+Data Science | Python | SQL | Machine Learning  
 
 [LinkedIn](https://www.linkedin.com/in/gulsara-mirzayeva/) | [Email](mailto:mirzayevagulsare@gmail.com)
