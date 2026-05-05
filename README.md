@@ -80,11 +80,50 @@ It supports manual prediction, PostgreSQL customer lookup, bulk CSV prediction, 
 
 --- 
 
+## 📊 Tableau Dashboard Preview
+
+I also created Tableau dashboards to present the churn analysis from a business decision-making perspective.
+
+While the Streamlit app focuses on prediction and customer-level interaction, the Tableau dashboards are used as a reporting and monitoring layer.
+
+The Tableau dashboards focus on:
+
+- overall churn and retention patterns
+- customer status and contract distribution
+- churn reason patterns
+- predicted high-risk customers
+- revenue at risk
+- geographic risk concentration
+- action-oriented customer prioritization
+
+The Tableau dataset was prepared from the PostgreSQL customer data and enriched with final model prediction outputs such as churn probability, predicted churn label, risk level, and revenue at risk.
+
+### 1. Executive Overview
+
+This dashboard summarizes the overall churn situation, including customer status, churn rate, retention rate, contract distribution, gender distribution, age distribution, and churn reason patterns.
+
+![Tableau Executive Overview](reports/images/tableau_executive_overview.png)
+
+### 2. Risk & Geo Insights
+
+This dashboard focuses on predicted customer risk, revenue exposure, geographic churn hotspots, risk deciles, and the highest-risk customers requiring retention action.
+
+![Tableau Risk and Geo Insights](reports/images/tableau_risk_geo_insights.png)
+
+### Tableau Public Dashboard
+
+The final Tableau dashboard is also available on Tableau Public:
+
+[Open Tableau Dashboard](https://public.tableau.com/app/profile/gulsara.mirzayeva/viz/TelcoChurnExecutiveDashboard/Overview?publish=yes)
+
+---
+
 ## 🛠 Tech Stack
 
 - **Data Storage & Validation:** PostgreSQL, Neon PostgreSQL, SQLAlchemy
 - **Data Processing:** Python, Pandas, NumPy
-- **Visualization & Statistics:** Matplotlib, Seaborn, SciPy
+- **Visualization & Statistics:** Matplotlib, Seaborn, SciPy, Tableau
+- **Dashboarding:** Tableau Public
 - **Modeling:** scikit-learn, XGBoost
 - **App & Deployment:** Streamlit, Streamlit Cloud, Plotly
 - **Workflow:** Jupyter Notebooks, GitHub
@@ -240,6 +279,25 @@ The final model was selected because it gives a better balance between performan
 
 ---
 
+### 7. Tableau Business Dashboard
+
+After deploying the Streamlit app, I created Tableau dashboards as a business-facing reporting layer.
+
+The goal of the Tableau dashboards is different from the Streamlit app:
+
+- Streamlit is used for churn prediction and customer-level interaction.
+- Tableau is used for monitoring churn patterns, risk concentration, geographic hotspots, and revenue exposure.
+
+The Tableau dashboards include:
+
+- an executive overview of churn and customer segments
+- a risk and geography dashboard based on model prediction outputs
+- high-risk customer prioritization for retention actions
+
+This helped connect the machine learning output with a clearer business decision-making view.
+
+---
+
 ## Final Modeling View
 
 This project does not end with “the model with the highest score wins.”
@@ -358,7 +416,9 @@ telco-churn-capstone/
 │   └── raw/
 │       └── telco.csv
 ├── models/
-│   └── conservative_logistic_regression_v2_pipeline.joblib
+│   ├── conservative_logistic_regression_pipeline.joblib
+│   ├── conservative_logistic_regression_v2_pipeline.joblib
+│   └── expanded_xgboost_pipeline.joblib
 ├── notebooks/
 │   ├── 01_data_audit.ipynb
 │   ├── 02_sql_validation.ipynb
@@ -366,9 +426,25 @@ telco-churn-capstone/
 │   ├── 04_preprocessing_and_feature_decisions.ipynb
 │   ├── 05_modeling_and_evaluation.ipynb
 │   └── 06_model_tuning_and_final_selection.ipynb
+├── reports/
+│   └── images/
+│       ├── streamlit_app_overview.png
+│       ├── prediction_result.png
+│       ├── model_explainability1.png
+│       ├── model_explainability2.png
+│       ├── model_explainability3.png
+│       ├── customer_lookup_postgresql1.png
+│       ├── customer_lookup_postgresql2.png
+│       ├── recommended_retention_actions.png
+│       ├── tableau_executive_overview.png
+│       └── tableau_risk_geo_insights.png
 ├── scripts/
 │   ├── upload_customer_lookup_to_neon.py
-│   └── check_neon_customer_table.py
+│   ├── check_neon_customer_table.py
+│   └── build_tableau_dashboard_table.py
+├── tableau/
+│   ├── telco_churn_dashboard.twbx
+│   └── telco_churn_tableau_dashboard_data.csv
 ├── requirements.txt
 ├── README.md
 └── model_documentation.md
@@ -428,23 +504,23 @@ Completed:
 - [x] Bulk CSV Prediction
 - [x] Model Explainability in App
 - [x] Model Documentation Summary
+- [x] Tableau Executive Overview Dashboard
+- [x] Tableau Risk & Geo Insights Dashboard
+- [x] Tableau Reporting Dataset
+- [x] Tableau Public Dashboard
 
 Remaining:
 
-- [ ] Tableau Dashboard
 - [ ] Final Presentation
-- [ ] Final README Screenshots / Polish
 - [ ] Final Notebook Cleanup
-
 ---
 
 ## ⏭ Next Steps
 
-1. **Tableau Dashboard:** Build a visual dashboard for churn segment analysis and business insights.
-2. **README Screenshots:** Add final screenshots from the Streamlit app.
-3. **Notebook Cleanup:** Review notebook markdowns and make sure the explanations are clear and not repetitive.
-4. **Final Presentation:** Prepare a concise project story from business problem to deployed solution.
-5. **Future Monitoring Note:** Add a short note about possible model monitoring, such as data drift and performance tracking.
+1. **Final Presentation:** Prepare a concise project story from business problem to deployed solution.
+2. **Notebook Cleanup:** Review notebook markdowns and make sure the explanations are clear and not repetitive.
+3. **Final Dashboard Review:** Review the Tableau Public dashboard and screenshots before final submission.
+4. **Future Monitoring Note:** Add a short note about possible model monitoring, such as data drift and performance tracking.
 
 ---
 

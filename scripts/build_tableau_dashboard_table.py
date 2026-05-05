@@ -246,6 +246,7 @@ def main():
     )
 
     dashboard_df["action_segment"] = create_action_segment(dashboard_df)
+    
     dashboard_df["recommended_action"] = dashboard_df.apply(create_recommendation, axis=1)
 
     dashboard_columns = [
@@ -260,6 +261,15 @@ def main():
         "tenure_in_months",
         "tenure_group",
         "offer",
+        "customer_status",
+        "city",
+        "state",
+        "zip_code",
+        "latitude",
+        "longitude",
+        "churn_category",
+        "churn_reason",
+        "cltv",
         "internet_service",
         "internet_type",
         "contract",
@@ -287,6 +297,7 @@ def main():
     ]
 
     dashboard_df = dashboard_df[dashboard_columns].copy()
+
 
     print(f"Writing dashboard table to PostgreSQL: {DASHBOARD_TABLE}")
     dashboard_df.to_sql(
